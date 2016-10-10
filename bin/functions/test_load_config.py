@@ -13,6 +13,9 @@ def touch(file_path):
 def remove(dir_path):
     shell("rm -rf " + dir_path)
 
+def print_hint_seperator(hint):
+    print("\n" + hint)
+    print("--------------------------------")
 
 def test_probe_hadoop_examples_jars():
 
@@ -34,6 +37,18 @@ def test_probe_hadoop_examples_jars():
         test = test_probe_hadoop_examples_jars_generator(case[1])
         setattr(ProbeHadoopExamplesTestCase, test_name, test)
 
+    print_hint_seperator("Test probe hadoop examples jars:")
+
+    suite = unittest.TestLoader().loadTestsFromTestCase(ProbeHadoopExamplesTestCase)
+    unittest.TextTestRunner(verbosity=2).run(suite)
+
+def test_probe_java_bin():
+    print_hint_seperator("Test probe java bin:")
+
+    suite = unittest.TestLoader().loadTestsFromTestCase(ProbeJavaBinTestCase)
+    unittest.TextTestRunner(verbosity=2).run(suite)
+
+
 class ProbeHadoopExamplesTestCase(unittest.TestCase):
     def setUp(self):
         HibenchConf["hibench.hadoop.home"] = "/tmp/hadoop_home"
@@ -42,8 +57,23 @@ class ProbeHadoopExamplesTestCase(unittest.TestCase):
         HibenchConf["hibench.hadoop.examples.jar"] = ""
         remove(HibenchConf["hibench.hadoop.home"])
 
+class ProbeJavaBinTestCase(unittest.TestCase):
+    def setUp(self):
+        self.java_home = "/tmp/java_home"
+        self.java_bin = self.java_home + "/bin/java"
+        pass
+    def tearDown(self):
+        remove(self.java_home)
+        pass
+    def test_probe_java_bin(self):
+        os.environ["JAVA_HOME"] = self.java_home # visible in this process + all children
+        touch(self.java_bin)
+        probe_java_bin()
+        answer = HibenchConf["java.bin"]
+        expected = self.java_bin
+        self.assertEqual(answer, expected)
+
+
 if __name__ == '__main__':
     test_probe_hadoop_examples_jars()
-
-    suite = unittest.TestLoader().loadTestsFromTestCase(ProbeHadoopExamplesTestCase)
-    unittest.TextTestRunner(verbosity=2).run(suite)
+    test_probe_java_bin()
