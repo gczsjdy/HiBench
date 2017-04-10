@@ -36,7 +36,7 @@ class Tables(sqlContext: SQLContext, dsdgenDir: String, scaleFactor: Int) extend
   def fetchDsdgenFromHDFS(hadoopExecutable: String) = {
     try {
       log.info(s"Executing: ${hadoopExecutable} fs -get ${dsdgenDir} ${dsdgenLocalDir}")
-      s"${hadoopExecutable} fs -get ${dsdgenDir} ${dsdgenLocalDir}".!!
+      s"${DataGen.HADOOP_EXECUTABLE} fs -get ${dsdgenDir} ${dsdgenLocalDir}".!!
     } catch {
       case e: java.lang.RuntimeException => log.info(e.toString)
     }
