@@ -22,7 +22,7 @@ import org.apache.spark.sql.hive.HiveContext
 
 object DataGen {
 
-  var HADOOP_EXECUTABLE = ""
+  val HADOOP_EXECUTABLE = "/usr/local/hadoop/bin/hadoop"
   def main(args: Array[String]): Unit = {
 
     if (args.length != 4){
@@ -35,7 +35,6 @@ object DataGen {
     val hdfs = args(0)
     val tableSize = args(1).toInt
     val dsdgenDir = args(2)
-    HADOOP_EXECUTABLE = args(3) + "/bin/hadoop"
 
     val sc = new SparkContext()
     val hiveContext = new HiveContext(sc)
